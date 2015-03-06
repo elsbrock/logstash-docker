@@ -1,0 +1,16 @@
+[Unit]
+Description=Logstash Docker Container
+After=docker.service
+
+[Service]
+Restart=always
+KillMode=control-group
+ExecStartPre=-/usr/bin/docker run --name=logstash-data -v /etc/service/logstash/data \
+    raumzeitlabor/logstash-docker echo "data-only container for logstash"
+ExecStart=/usr/bin/docker run --name=logstash --detach=false --cpu-shares=512 \
+    --memory=1024M --rm=true --volumes-from=logstash-data --hostname=logstash \
+    raumzeitlabor/logstash-docker
+ExecStop=/usr/bin/docker pull raumzeitlabor/logstash-docker:latest
+
+[Install]
+WantedBy=multi-user.target
